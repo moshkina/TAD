@@ -1,4 +1,4 @@
-%%writefile app.py
+
 import pickle
 
 import pandas as pd
@@ -7,8 +7,8 @@ import streamlit as st
 
 
 def main():
-    model = load_model("model.pkl")
-    test_data = load_test_data("preprocessed_data.csv")
+    model = load_model("model_dumps/gradient_boosting.sav")
+    test_data = load_test_data("data/csgo_task__data1.csv")
     
     page = st.sidebar.selectbox(
         "Выберите страницу",
@@ -107,14 +107,12 @@ def main():
             Ct_players_alive = st.selectbox("Кол-во живых игроков кт команды", ['1', '2', '3+'])
             Ct_players_alive = 1 if Ct_players_alive == '3+' else 0
 
-            T_players_alive = st.selectbox("Кол-во шлемов т команды", ['1', '2', '3+'])
+            T_players_alive = st.selectbox("Кол-во живых игроков т команды", ['1', '2', '3+'])
             T_players_alive = 1 if T_players_alive == '3+' else 0
 
 
             if st.button('Предсказать'):
-                data = [Time_left, Ct_score, T_score, 0, Ct_health, T_health, Ct_armor, T_armor, 0, 0, Ct_helmets, T_helmets, Ct_defuse_kits, Ct_players_alive, T_players_alive]
-                for item in one_hot_occup + one_hot_cat:
-                    data.append(item)
+                data = [Time_left, Ct_score, T_score, Ct_health, T_health, Ct_armor, T_armor, 0, 0, Ct_helmets, T_helmets, Ct_defuse_kits, Ct_players_alive, T_players_alive, 0, 0, 0, 0, 0, 0, 0]
                 data = np.array(data).reshape((1, -1))
                 pred = model.predict(data)
                 st.write(f"Предсказанное значение: {pred[0]:.2f}")
@@ -132,7 +130,7 @@ def load_model(path_to_file):
 @st.cache_data
 def load_test_data(path_to_file):
     df = pd.read_csv(path_to_file, index_col='Unnamed: 0')
-    df = df.drop(labels=['Product_ID'], axis=1)
+    df = df.drop(labels=['bomb_planted'], axis=1)
     return df
 
 
